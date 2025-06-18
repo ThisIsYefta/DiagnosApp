@@ -1,37 +1,58 @@
-// DiseaseResult.tsx
-export default function DiseaseResult({ results }: { results: any[] }) {
-  if (!results.length) return null;
+import React from 'react';
 
+interface DiseaseResultProps {
+  results: { name: string; probability: number }[];
+}
+
+export default function DiseaseResult({ results }: DiseaseResultProps) {
+  if (!results || results.length === 0) {
+    return (
+      <div className="text-center p-8 bg-slate-100 rounded-lg">
+        <p className="text-slate-600">Tidak ada hasil diagnosis yang dapat ditampilkan.</p>
+      </div>
+    );
+  }
+  
   const topResults = [...results]
     .sort((a, b) => Number(b.probability) - Number(a.probability))
     .slice(0, 3);
 
   return (
-    // Tambahkan text-gray-800 secara eksplisit di sini untuk memastikan warna teks keseluruhan
-    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md text-gray-800 mb-6">
-      {/* H2 sudah text-green-700 */}
-      <h2 className="text-xl md:text-2xl font-bold mb-3 text-green-700">
-        Hasil Diagnosa
-      </h2>
-      <ul className="mb-4 text-base md:text-lg space-y-1">
+    <div className="space-y-6">
+      <p className="text-slate-600 text-center">
+        Berdasarkan gejala Anda, berikut adalah kemungkinan kondisi teratas.
+      </p>
+      <ul className="space-y-5">
         {topResults.map((r, idx) => {
-          const trueProbability = Number(r.probability);
-          const formattedPercentage = trueProbability.toFixed(2);
-          // const formattedPercentage = trueProbability.toFixed(2).replace('.', ','); // Untuk format Indonesia
+          const percentage = Number(r.probability) || 0;
+          const isTopResult = idx === 0;
 
           return (
             <li key={idx}>
-              <span className="font-semibold">{r.name}</span>{" "}
-              {/* Span ini sudah text-gray-700 */}
-              <span className="font-medium text-gray-700">{formattedPercentage}%</span>
+              <div className="flex justify-between items-center mb-1.5">
+                <span className={`font-bold text-lg ${isTopResult ? 'text-sky-700' : 'text-slate-800'}`}>
+                  {r.name || "Tidak Dikenal"}
+                </span>
+                <span className={`font-semibold text-base ${isTopResult ? 'text-sky-600' : 'text-slate-600'}`}>
+                  {percentage.toFixed(2)}%
+                </span>
+              </div>
+              <div className="w-full bg-slate-200 rounded-full h-3">
+                <div
+                  className={`h-3 rounded-full transition-all duration-500 ${isTopResult ? 'bg-sky-500' : 'bg-slate-400'}`}
+                  style={{ width: `${percentage}%` }}
+                ></div>
+              </div>
             </li>
           );
         })}
       </ul>
-      {/* Paragraf ini sudah text-red-600 */}
-      <p className="text-red-600 font-semibold text-sm md:text-base">
-        Segera datanglah dan konsultasikan kepada dokter di Rumah Sakit terdekat kamu yaa!!!
-      </p>
+      <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 rounded-r-lg">
+        <p className="font-bold">Penting untuk Diingat</p>
+        <p>
+          Hasil ini bersifat informatif dan bukan diagnosis medis final. Segera konsultasikan dengan dokter untuk kepastian.
+        </p>
+      </div>
     </div>
   );
 }
